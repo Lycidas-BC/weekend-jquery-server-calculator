@@ -36,12 +36,12 @@ function buttonPush() {
             .then( function(response) {
                 // successful send case
                 console.log('posted item', response);
+                equationGlobal="";
+                $( "#equation" ).val(equationGlobal);
             })
             .catch( function(err) {
                 console.log('failed to post', err);
             });
-            equationGlobal="";
-            $( "#equation" ).val(equationGlobal);
             break;
         case "plus":
             equationGlobal += " + ";
