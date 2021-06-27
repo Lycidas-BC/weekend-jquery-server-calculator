@@ -73,23 +73,42 @@ function evaluate(equation, order) {
     //.split to change equation string into array of numbers and operators
     //reg ex [-+_*/] matches operators, g makes it so they don't get removed
     //filter array for empty strings ( /\S/ is a regular expression that matches only non-whitespace characters
+    //map trim whitespace onto each element
     let equationArray = equation.split(/([-+_*/])/g);
     equationArray = equationArray.filter(function(str) {
         return /\S/.test(str);
     });
+    equationArray = equationArray.map(x => x.trim());
     console.log(equationArray);
     
     //validate equationArray:
 
     //if equation starts with +, *, or / return error
-    //if equation starts with -, check second element
     //if equation ends with -, +, *, or / return error
     let indexFromBack = equationArray.length - 1;
-    if (
-        equationArray[0].search(/[+_*/]/) > -1 || 
-        equationArray[indexFromBack].search(/[-+_*/]/) > -1 ||
-        (equationArray[0].indexOf("-") > -1 && equationArray[1].search(/[+_*/]/) > -1)) {
-        return "error: cannot begin or end with an operation (unless making a number negative)"
+    if (equationArray[0].search(/[+_*/]/) > -1 || equationArray[indexFromBack].search(/[-+_*/]/) > -1) {
+        return "error: cannot begin or end with an operation (unless making a number negative)";
+    }
+    //remove leading negatives or double negatives
+    while(equationArray[0] == "-") {
+        if (equationArray[1] == "-") {
+            // if there's a double negative, drop them both
+            equationArray.shift();
+            equationArray.shift();
+        } else if (equationArray[1].search(/[+_*/]/) > -1) {
+            // if there's some other operation, throw error
+            return "error: cannot begin or end with an operation (unless making a number negative)";
+        } else {
+            // make negative, shift off leading "-"
+            equationArray[1] = "-" + equationArray[1];
+            equationArray.shift();
+        }
+    }
+
+    indexFromBack = equationArray.length - 1;
+    if (indexFromBack == 0){
+        //if there's only one element in the array, return that
+        return equationArray[indexFromBack];
     }
 
     //check for 
@@ -99,11 +118,7 @@ function evaluate(equation, order) {
         if (equationArray[indexFromBack] === "-" && equationArray[indexFromBack+1] === "-") {
             //if we have two negatives in a row, splice them out
             console.log('double negative:',equationArray, equationArray[indexFromBack], equationArray[indexFromBack+1]);
-            if (typeof equationArray[indexFromBack-1] !== "undefined") {
-                //splice out the double negative
-                equationArray.splice(indexFromBack,2);
-                console.log('splice double negative:', equationArray);
-            } else if(equationArray[indexFromBack-1].search(/[-+_*/]/) == -1 && equationArray[indexFromBack+2].search(/[-+_*/]/) == -1){
+            if(equationArray[indexFromBack-1].search(/[-+_*/]/) == -1 && equationArray[indexFromBack+2].search(/[-+_*/]/) == -1){
                 //if there's a number before and after the double negative, replace it with a +
                 equationArray[indexFromBack] = "+";
                 equationArray.splice(indexFromBack+1, 1);
@@ -118,7 +133,9 @@ function evaluate(equation, order) {
             if (equationArray[indexFromBack+1] === "-") {
                 //if the second one is "-", make the next value negative and splice it out
                 equationArray[indexFromBack+2] = "-" + equationArray[indexFromBack+2];
+                console.log(equationArray);
                 equationArray.splice(indexFromBack+1,1);
+                console.log(equationArray);
             } else {
                 return "error: two operations in a row"
             }
@@ -139,28 +156,35 @@ function evaluate(equation, order) {
     let operation = "";
     if (order === "leftToRight"){
         for (const index in equationArray){
+            console.log("runningTotal", runningTotal, "operation", operation);
+            console.log(parseFloat(equationArray[index]), equationArray[index]);
             if (index == 0) {
-                runningTotal = Number(equationArray[0]);
-            } else if (equationArray[index].search(/[-+_*/]/) > -1){
+                runningTotal = parseFloat(equationArray[0]);
+            } else if (equationArray[index].search(/[+_*/]/ || equationArray[index] === "-") > -1){
                 operation = equationArray[index];
             } else {
                 switch (operation) {
                     case "+":
-                        runningTotal += Number(equationArray[index]);
+                        runningTotal += parseFloat(equationArray[index]);
+                        console.log("runningTotal",runningTotal);
                         break;
                     case "-":
-                        runningTotal -= Number(equationArray[index]);
+                        runningTotal -= parseFloat(equationArray[index]);
+                        console.log("runningTotal",runningTotal),"-";
                         break;
                     case "*":
-                        runningTotal *= Number(equationArray[index]);
+                        runningTotal *= parseFloat(equationArray[index]);
+                        console.log("runningTotal",runningTotal),"*";
                         break;
                     case "/":
-                        if (Number(equationArray[index]) === 0) {
+                        if (parseFloat(equationArray[index]) === 0) {
                             return "error: divide by 0";
                         }
-                        runningTotal /= Number(equationArray[index]);
+                        runningTotal /= parseFloat(equationArray[index]);
+                        console.log("runningTotal",runningTotal),"/";
                         break;
                     default:
+                        console.log("runningTotal",runningTotal),"d";
                         break;
                 }
             }
@@ -169,5 +193,6 @@ function evaluate(equation, order) {
     else {
 
     } //end PEMDAS case
-    return runningTotal;
+    // round to 10 digits precision
+    return Math.round(runningTotal*10000000000)/10000000000;
 } //end evaluate
