@@ -23,31 +23,14 @@ function buttonPush() {
     console.log(button);
     switch (button) {
         case "equals":
-            // send to server
-            $.ajax({
-                //type
-                method: 'POST',
-                url: '/calculate',
-                data: {
-                    equation: equationGlobal,
-                    order: orderGlobal
-                } //data becomes req.body on server
-            })
-            .then( function(response) {
-                // successful send case
-                console.log('posted item', response);
-                equationGlobal="";
-                $( "#equation" ).val(equationGlobal);
-            })
-            .catch( function(err) {
-                console.log('failed to post', err);
-            });
+            postAndGet();
             break;
         case "plus":
             equationGlobal += " + ";
             $( "#equation" ).val(equationGlobal);
             break;
         case "minus":
+            if (equationGlobal === "" || equationGlobal[equationGlobal.trim().length - 1])
             equationGlobal += " - ";
             $( "#equation" ).val(equationGlobal);
             break;
@@ -78,6 +61,49 @@ function buttonPush() {
 function clearHistory() {
     
 } //end clearHistory
+
+function postAndGet(params) {
+    // send to server
+    $.ajax({
+        //type
+        method: 'POST',
+        url: '/calculate',
+        data: {
+            equation: equationGlobal,
+            order: orderGlobal
+        } //data becomes req.body on server
+    })
+    .then( function(response) {
+        // successful send case
+        console.log('POST item:', response);
+        equationGlobal="";
+        $( "#equation" ).val(equationGlobal);
+    })
+    .catch( function(err) {
+        console.log('failed to post', err);
+    });
+
+    $.ajax({
+        //type
+        method: 'GET',
+        url: '/calculate'
+    })
+    .then( function(response) {
+        // successful send case
+        console.log('GET item:', response);
+        // update lastResult
+        $( "#lastResult" ).empty();
+        $( "#lastResult" ).append(`${response[0].equation} = ${response[0].answer} (evaluated ${response[0].order === "PEMDAS" ? "following PEMDAS" : "from left to right"})`);
+        
+        $( "#history" ).empty();
+        for (const historyItem of response) {
+            $( "#history" ).append(`<li>${historyItem.equation} = ${historyItem.answer} (evaluated ${historyItem.order === "PEMDAS" ? "following PEMDAS" : "from left to right"})</li>`);
+        }
+    })
+    .catch( function(err) {
+        console.log('failed to post', err);
+    });
+}
 
 function toggleOrderOfOperations() {
     const el = $('#setOrderOfOperations');
