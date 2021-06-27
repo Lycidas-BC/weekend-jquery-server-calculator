@@ -72,9 +72,11 @@ function evaluate(equation, order) {
 
     //.split to change equation string into array of numbers and operators
     //reg ex [-+_*/] matches operators, g makes it so they don't get removed
-    //filter array for empty strings
+    //filter array for empty strings ( /\S/ is a regular expression that matches only non-whitespace characters
     let equationArray = equation.split(/([-+_*/])/g);
-    equationArray = equationArray.filter(element => (element != /\s/g ));
+    equationArray = equationArray.filter(function(str) {
+        return /\S/.test(str);
+    });
     console.log(equationArray);
     
     //validate equationArray:
@@ -96,14 +98,20 @@ function evaluate(equation, order) {
         console.log("element, element is operation", equationArray[indexFromBack], equationArray[indexFromBack].search(/[+_*/]/) > -1);
         if (equationArray[indexFromBack] === "-" && equationArray[indexFromBack+1] === "-") {
             //if we have two negatives in a row, splice them out
-            console.log('double negative:',equationArray, equationArray[indexFromBack], equationArray[indexFromBack]);
-            if (equationArray[indexFromBack-1] === "-" && equationArray[indexFromBack+2]){
+            console.log('double negative:',equationArray, equationArray[indexFromBack], equationArray[indexFromBack+1]);
+            if (typeof equationArray[indexFromBack-1] !== "undefined") {
+                //splice out the double negative
+                equationArray.splice(indexFromBack,2);
+                console.log('splice double negative:', equationArray);
+            } else if(equationArray[indexFromBack-1].search(/[-+_*/]/) == -1 && equationArray[indexFromBack+2].search(/[-+_*/]/) == -1){
                 //if there's a number before and after the double negative, replace it with a +
                 equationArray[indexFromBack] = "+";
                 equationArray.splice(indexFromBack+1, 1);
+                console.log('splice double negative:', equationArray);
             } else {
                 //otherwise, just splice out the double negative
                 equationArray.splice(indexFromBack,2);
+                console.log('splice double negative:', equationArray);
             }
         } else if (equationArray[indexFromBack].search(/[-+_*/]/) > -1 && equationArray[indexFromBack+1].search(/[-+_*/]/) > -1) {
             //check for two operations in a row
