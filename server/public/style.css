@@ -1,3 +1,19 @@
 fieldset {
     display: inline-block;
 }
+
+#numpad button {
+    text-align: center;
+    font-size: 16px;
+    border-radius: 50%;
+    width: 27px;
+    padding: 2px;
+    padding-top: 3px;
+    margin: 2px;
+}
+
+#numpad button:active {
+    background-color: #7c7c7c;
+    box-shadow: 0 1px rgb(87, 87, 87);
+    transform: translateY(1px);
+}
