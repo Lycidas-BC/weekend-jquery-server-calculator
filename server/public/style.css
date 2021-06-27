@@ -2,7 +2,7 @@ fieldset {
     display: inline-block;
 }
 
-#numpad button {
+.calculatorButton {
     text-align: center;
     font-size: 16px;
     border-radius: 50%;
@@ -12,8 +12,30 @@ fieldset {
     margin: 2px;
 }
 
-#numpad button:active {
+.calculatorButton:active {
     background-color: #7c7c7c;
     box-shadow: 0 1px rgb(87, 87, 87);
     transform: translateY(1px);
+}
+
+#button_equals {
+    background-color: lightgreen;
+}
+
+#button_equals:active {
+    background-color: green;
+}
+
+#button_clear {
+    background-color: red;
+}
+
+#button_clear:active {
+    background-color: maroon;
+}
+
+#setOrderOfOperations {
+    text-align: center;
+    margin-top: 5px;
+    width: 135px;
 }
