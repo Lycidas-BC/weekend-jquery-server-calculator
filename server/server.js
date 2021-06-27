@@ -191,7 +191,7 @@ function evaluate(equation, order) {
         }
     } //end leftToRight case
     else {
-
+        return "Sorry, PEMDAS order of operations is not yet available in your version. Make sure you're using the most up-to-date version of the software";
     } //end PEMDAS case
     // round to 10 digits precision
     return Math.round(runningTotal*10000000000)/10000000000;
