@@ -168,7 +168,7 @@ function evaluate(equation, order) {
         for (const index in equationArray){
             if (index == 0) {
                 runningTotal = parseFloat(equationArray[0]);
-            } else if (equationArray[index].search(/[+_*/]/ || equationArray[index] === "-") > -1){
+            } else if (equationArray[index].search(/[+_*/]/) > -1 || equationArray[index] == "-"){
                 operation = equationArray[index];
             } else {
                 switch (operation) {
