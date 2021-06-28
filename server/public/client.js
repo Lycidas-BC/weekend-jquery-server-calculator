@@ -9,7 +9,7 @@ function onReady() {
     })
     $( "#setOrderOfOperations" ).on("click", toggleOrderOfOperations)
     $( "#clearHistory" ).on("click",clearHistory);
-
+    $( "#history" ).on("click", "li", loadEquation)
 } //end onReady
 
 //globals initialized
@@ -78,6 +78,19 @@ function clearHistory() {
     });
 } //end clearHistory
 
+function loadEquation() {
+    const elementText = this.innerText;
+    
+    let equation = elementText.substring(0,elementText.indexOf("="));
+    $( "#equation" ).val(equation);
+    equationGlobal = equation;
+    if (elementText.indexOf("PEMDAS") > -1) {
+        setOrderOfOperations("PEMDAS");
+    } else {
+        setOrderOfOperations("leftToRight");
+    }
+} //end loadEquation
+
 function postAndGet() {
     if (equationGlobal != "") {
         // send to server
@@ -123,7 +136,18 @@ function postAndGet() {
     .catch( function(err) {
         console.log('failed to post', err);
     });
-}
+} //end postAndGet
+
+function setOrderOfOperations(inputOrder) {
+    const el = $('#setOrderOfOperations');
+    if (inputOrder == "PEMDAS") {
+        el.html("Follow PEMDAS");
+        orderGlobal = "PEMDAS";
+    } else {
+        el.html("Evaluate left to right");
+        orderGlobal = "leftToRight";
+    }
+} //end setOrderOfOperations
 
 function toggleOrderOfOperations() {
     const el = $('#setOrderOfOperations');
