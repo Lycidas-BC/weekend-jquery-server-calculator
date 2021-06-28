@@ -42,6 +42,16 @@ app.get('/calculate', function(req, res) {
     res.send(historyArray);
   });
 
+app.post('/clearHistory', (req, res) => {
+    console.log('in post for calculate', req.body);
+    
+    //empty historyArray
+    historyArray = [];
+  
+    // always respond
+    res.sendStatus(201); // 201 is good!
+});
+
 function evaluate(equation, order) {
     console.log(equation, order);
     
@@ -107,7 +117,12 @@ function evaluate(equation, order) {
 
     indexFromBack = equationArray.length - 1;
     if (indexFromBack == 0){
-        //if there's only one element in the array, return that
+        //if there's only one element in the array, make sure it's a valid number
+        if (equationArray[indexFromBack].split('.').length > 2) {
+            //if there's more than 1 decimal point in a number, that's an error
+            return "error: invalid number had too many decimal points";
+        }
+        //if it's valid, return that
         return equationArray[indexFromBack];
     }
 
@@ -181,12 +196,10 @@ function evaluate(equation, order) {
     else {
         let count = 0;
         while(equationArray.length > 1 && count < 10) {
-            console.log(equationArray);
             const nextMult = equationArray.findIndex(element => element === "*");
             const nextDiv = equationArray.findIndex(element => element === "/");
             const nextAdd = equationArray.findIndex(element => element === "+");
             const nextSub = equationArray.findIndex(element => element === "-");
-            console.log("nextMult",nextMult,"NextDiv",nextDiv,"NextAdd",nextAdd,"NextSub",nextSub)
             if (nextMult > -1 || nextDiv > -1) {
                 //if there is multiplication or division, do those first
                 console.log("AAA", nextMult, nextDiv, nextMult != -1, parseFloat(equationArray[nextMult-1]),parseFloat(equationArray[nextMult+1]));
@@ -200,30 +213,24 @@ function evaluate(equation, order) {
                         return "error: divide by 0";
                     }
                     const quotient = parseFloat(equationArray[nextDiv-1]) / parseFloat(equationArray[nextDiv+1]);
-                    console.log(quotient);
                     equationArray.splice(nextDiv-1,3,quotient);
-                    console.log(equationArray);
                 }
             } else if (nextAdd > -1 || nextSub > -1) {
                 //once we've done all multiplication and division, do addition and subtraction from left to right
                 if ((nextAdd < nextSub || nextSub == -1) && nextAdd != -1) {
                     //if addition is left of subtraction or there is no subtraction, add and splice
                     const sum = parseFloat(equationArray[nextAdd-1]) + parseFloat(equationArray[nextAdd+1]);
-                    console.log(sum);
                     equationArray.splice(nextAdd-1,3,sum);
-                    console.log(equationArray);
                 } else {
                     //either there is no addition or it's after the next subtraction. Subtract and splice
                     const difference = parseFloat(equationArray[nextSub-1]) - parseFloat(equationArray[nextSub+1]);
-                    console.log(difference);
                     equationArray.splice(nextSub-1,3,difference);
-                    console.log(equationArray);
                 }
             }
             count +=1;
         }
         runningTotal = equationArray[0];
     } //end PEMDAS case
-    // round to 10 digits precision
+    // round to 10 digits precision and return
     return Math.round(runningTotal*10000000000)/10000000000;
 } //end evaluate
