@@ -53,7 +53,7 @@ app.post('/clearHistory', (req, res) => {
 });
 
 function evaluate(equation, order) {
-    console.log(equation, order);
+    console.log("equation:", equation,"order:", order);
     
     //check for parentheses
     if (equation.indexOf("(")>-1) {
@@ -65,16 +65,16 @@ function evaluate(equation, order) {
             if (equation.indexOf(")") === -1) {
                 return "error: unclosed parentheses";
             } else {
-                //replace parenthetical with evaluate(parenthetical)
+                //replace parenthetical with evaluate(parenthetical, order)
                 const openParenIndex = equation.indexOf("(");
                 const closingParenIndex = equation.indexOf(")",openParenIndex);
                 const parentheses = equation.substring(openParenIndex + 1, closingParenIndex);
-                const evaluateParentheses = evaluate(parentheses)
+                const evaluateParentheses = String(evaluate(parentheses,order));
                 if (evaluateParentheses.indexOf("error") > -1) {
                     //if parentheses returns an error, pass it on
                     return evaluateParentheses;
                 } else {
-                    return evaluate(equation.replace(parentheses, evaluateParentheses));
+                    return evaluate(equation.replace("("+parentheses+")", evaluateParentheses),order);
                 }
             }
         }
@@ -202,7 +202,6 @@ function evaluate(equation, order) {
             const nextSub = equationArray.findIndex(element => element === "-");
             if (nextMult > -1 || nextDiv > -1) {
                 //if there is multiplication or division, do those first
-                console.log("AAA", nextMult, nextDiv, nextMult != -1, parseFloat(equationArray[nextMult-1]),parseFloat(equationArray[nextMult+1]));
                 if ((nextMult < nextDiv || nextDiv == -1) && nextMult != -1) {
                     //if multiplication is left of division or if there is no division, multiply numbers and splice them into array
                     const product = parseFloat(equationArray[nextMult-1]) * parseFloat(equationArray[nextMult+1]);
