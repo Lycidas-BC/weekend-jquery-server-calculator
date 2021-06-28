@@ -1,7 +1,7 @@
 $( document ).ready(onReady);
 
 function onReady() {
-    postAndGet();
+    get();
     $( "#numpad" ).on("click",".calculatorButton", buttonPush);
     $( "#equation" ).on("change", function( event ) {
         equationGlobal = $( "#equation" ).val();
@@ -23,7 +23,7 @@ function buttonPush() {
     let button = this.id.substring(this.id.indexOf("_")+1);
     switch (button) {
         case "equals":
-            postAndGet();
+            postAndCallGet();
             break;
         case "plus":
             equationGlobal += " + ";
@@ -71,49 +71,14 @@ function clearHistory() {
         console.log('POST item:', response);
         equationGlobal="";
         $( "#equation" ).val(equationGlobal);
-        postAndGet();
+        get();
     })
     .catch( function(err) {
         console.log('failed to post', err);
     });
 } //end clearHistory
 
-function loadEquation() {
-    const elementText = this.innerText;
-    
-    let equation = elementText.substring(0,elementText.indexOf("="));
-    $( "#equation" ).val(equation);
-    equationGlobal = equation;
-    if (elementText.indexOf("PEMDAS") > -1) {
-        setOrderOfOperations("PEMDAS");
-    } else {
-        setOrderOfOperations("leftToRight");
-    }
-} //end loadEquation
-
-function postAndGet() {
-    if (equationGlobal != "") {
-        // send to server
-        $.ajax({
-            //type
-            method: 'POST',
-            url: '/calculate',
-            data: {
-                equation: equationGlobal,
-                order: orderGlobal
-            } //data becomes req.body on server
-        })
-        .then( function(response) {
-            // successful send case
-            console.log('POST item:', response);
-            equationGlobal="";
-            $( "#equation" ).val(equationGlobal);
-        })
-        .catch( function(err) {
-            console.log('failed to post', err);
-        });
-    }
-
+function get(){
     $.ajax({
         //type
         method: 'GET',
@@ -136,7 +101,47 @@ function postAndGet() {
     .catch( function(err) {
         console.log('failed to post', err);
     });
-} //end postAndGet
+} //end get
+
+function loadEquation() {
+    const elementText = this.innerText;
+    
+    let equation = elementText.substring(0,elementText.indexOf("="));
+    $( "#equation" ).val(equation);
+    equationGlobal = equation;
+    if (elementText.indexOf("PEMDAS") > -1) {
+        setOrderOfOperations("PEMDAS");
+    } else {
+        setOrderOfOperations("leftToRight");
+    }
+} //end loadEquation
+
+function postAndCallGet() {
+    if (equationGlobal != "") {
+        // send to server
+        $.ajax({
+            //type
+            method: 'POST',
+            url: '/calculate',
+            data: {
+                equation: equationGlobal,
+                order: orderGlobal
+            } //data becomes req.body on server
+        })
+        .then( function(response) {
+            // successful send case
+            console.log('POST item:', response);
+            equationGlobal="";
+            $( "#equation" ).val(equationGlobal);
+            get();
+        })
+        .catch( function(err) {
+            console.log('failed to post', err);
+        });
+    }
+
+    
+} //end postAndCallGet
 
 function setOrderOfOperations(inputOrder) {
     const el = $('#setOrderOfOperations');
