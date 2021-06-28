@@ -69,7 +69,7 @@ function evaluate(equation, order) {
                 const openParenIndex = equation.indexOf("(");
                 const closingParenIndex = equation.indexOf(")",openParenIndex);
                 const parentheses = equation.substring(openParenIndex + 1, closingParenIndex);
-                const evaluateParentheses = String(evaluate(parentheses,order));
+                const evaluateParentheses = parentheses.trim() != "" ? String(evaluate(parentheses,order)) : "";
                 if (evaluateParentheses.indexOf("error") > -1) {
                     //if parentheses returns an error, pass it on
                     return evaluateParentheses;
