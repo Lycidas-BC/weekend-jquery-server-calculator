@@ -201,7 +201,7 @@ function evaluate(equation, order) {
                     }
                     const quotient = parseFloat(equationArray[nextDiv-1]) / parseFloat(equationArray[nextDiv+1]);
                     console.log(quotient);
-                    equationArray.splice(nextMult-1,3,quotient);
+                    equationArray.splice(nextDiv-1,3,quotient);
                     console.log(equationArray);
                 }
             } else if (nextAdd > -1 || nextSub > -1) {
@@ -223,7 +223,6 @@ function evaluate(equation, order) {
             count +=1;
         }
         runningTotal = equationArray[0];
-        //return "Sorry, PEMDAS order of operations is not yet available in your version. Make sure you're using the most up-to-date version of the software";
     } //end PEMDAS case
     // round to 10 digits precision
     return Math.round(runningTotal*10000000000)/10000000000;
