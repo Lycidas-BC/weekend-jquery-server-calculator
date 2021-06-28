@@ -140,7 +140,7 @@ function evaluate(equation, order) {
                 //otherwise, just splice out the double negative
                 equationArray.splice(indexFromBack,2);
             }
-        } else if (equationArray[indexFromBack].search(/[-+_*/]/) > -1 && equationArray[indexFromBack+1].search(/[-+_*/]/) > -1) {
+        } else if ((equationArray[indexFromBack].search(/[+_*/]/) > -1 || equationArray[indexFromBack] == "-") && (equationArray[indexFromBack+1].search(/[+_*/]/) > -1  || equationArray[indexFromBack+1] == "-")) {
             //check for two operations in a row
             if (equationArray[indexFromBack+1] === "-") {
                 //if the second one is "-", make the next value negative and splice it out
